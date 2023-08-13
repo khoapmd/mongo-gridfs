@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "es6-promise": "^4.2.8",
-    "mongodb": "5.3.0",
+    "mongodb": "5.7.0",
     "os-tmpdir": "^2.0.0",
     "unique-filename": "^3.0.0"
   },
