@@ -1,3 +1,4 @@
+# Deprecated ****
 # mongo-gridfs
 
 This is a simple wrapper for the new [MongoDB GridFSBucket API](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/gridfs/streaming/).
