@@ -92,15 +92,15 @@ export class MongoGridFS {
     public async downloadFile(id: string, options?: IDownloadOptions): Promise<string> {
         const object = await this.findById(id);
         const downloadPath = MongoGridFS.getDownloadPath(object, options);
-        return new Promise<string>(async (resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             this.bucket.openDownloadStream(object._id)
-                .once('error', async (error) => {
+                .once('error', (error) => {
                     reject(error);
                 })
-                .once('end', async () => {
+                .once('end', () => {
                     resolve(downloadPath);
                 })
-                .pipe(fs.createWriteStream(downloadPath, {}));
+                .pipe(fs.createWriteStream(downloadPath));
         });
     }
 
@@ -136,25 +136,38 @@ export class MongoGridFS {
     }
 
     /**
-     * Find objects by condition
+     * Write stream to GridFS
      * @param stream
      * @param options
      */
     public writeFileStream(stream: Stream, options: IGridFSWriteOption): Promise<IGridFSObject> {
-        return new Promise((resolve, reject) => stream
-            .pipe(this.bucket.openUploadStream(options.filename, {
+        return new Promise((resolve, reject) => {
+            const uploadStream = this.bucket.openUploadStream(options.filename, {
                 aliases: options.aliases,
                 chunkSizeBytes: options.chunkSizeBytes,
                 contentType: options.contentType,
                 metadata: options.metadata,
-            }))
-            .on('error', async (err) => {
+            });
+
+            stream.pipe(uploadStream);
+
+            uploadStream.on('error', (err) => {
                 reject(err);
-            })
-            .on('finish', async (item: IGridFSObject) => {
-                resolve(item);
-            }),
-        );
+            });
+
+            uploadStream.on('finish', () => {
+                resolve({
+                    _id: uploadStream.id as ObjectId,
+                    length: uploadStream.length,
+                    chunkSize: uploadStream.chunkSizeBytes,
+                    filename: options.filename,
+                    contentType: options.contentType,
+                    aliases: options.aliases,
+                    metadata: options.metadata,
+                    uploadDate: new Date()
+                });
+            });
+        });
     }
 
     /**
@@ -186,17 +199,16 @@ export class MongoGridFS {
     }
 
     /**
-     * Delete an File from the GridFS
+     * Delete a File from the GridFS
      * @param {string} id
      * @return {Promise<boolean>}
      */
-    public delete(id: string): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            this.bucket.delete(new ObjectId(id))
-            .then(()=>resolve(true))
-            .catch((err=>{
-                reject(err);
-            }));
-        });
+    public async delete(id: string): Promise<boolean> {
+        try {
+            await this.bucket.delete(new ObjectId(id));
+            return true;
+        } catch (err) {
+            throw err;
+        }
     }
 }

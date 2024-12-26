@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { ObjectId } from 'bson';
 import { Db, GridFSBucket, GridFSBucketReadStream } from 'mongodb';
 import { Stream } from 'stream';
@@ -66,7 +65,7 @@ export declare class MongoGridFS {
      */
     find(filter: any): Promise<IGridFSObject[]>;
     /**
-     * Find objects by condition
+     * Write stream to GridFS
      * @param stream
      * @param options
      */
@@ -80,7 +79,7 @@ export declare class MongoGridFS {
      */
     uploadFile(uploadFilePath: string, options: IGridFSWriteOption, deleteFile?: boolean): Promise<IGridFSObject>;
     /**
-     * Delete an File from the GridFS
+     * Delete a File from the GridFS
      * @param {string} id
      * @return {Promise<boolean>}
      */

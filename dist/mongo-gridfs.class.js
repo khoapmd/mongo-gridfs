@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -127,26 +127,16 @@ var MongoGridFS = /** @class */ (function () {
                     case 1:
                         object = _a.sent();
                         downloadPath = MongoGridFS.getDownloadPath(object, options);
-                        return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _this = this;
-                                return __generator(this, function (_a) {
-                                    this.bucket.openDownloadStream(object._id)
-                                        .once('error', function (error) { return __awaiter(_this, void 0, void 0, function () {
-                                        return __generator(this, function (_a) {
-                                            reject(error);
-                                            return [2 /*return*/];
-                                        });
-                                    }); })
-                                        .once('end', function () { return __awaiter(_this, void 0, void 0, function () {
-                                        return __generator(this, function (_a) {
-                                            resolve(downloadPath);
-                                            return [2 /*return*/];
-                                        });
-                                    }); })
-                                        .pipe(fs.createWriteStream(downloadPath, {}));
-                                    return [2 /*return*/];
-                                });
-                            }); })];
+                        return [2 /*return*/, new Promise(function (resolve, reject) {
+                                _this.bucket.openDownloadStream(object._id)
+                                    .once('error', function (error) {
+                                    reject(error);
+                                })
+                                    .once('end', function () {
+                                    resolve(downloadPath);
+                                })
+                                    .pipe(fs.createWriteStream(downloadPath));
+                            })];
                 }
             });
         });
@@ -203,31 +193,36 @@ var MongoGridFS = /** @class */ (function () {
         });
     };
     /**
-     * Find objects by condition
+     * Write stream to GridFS
      * @param stream
      * @param options
      */
     MongoGridFS.prototype.writeFileStream = function (stream, options) {
         var _this = this;
-        return new Promise(function (resolve, reject) { return stream
-            .pipe(_this.bucket.openUploadStream(options.filename, {
-            aliases: options.aliases,
-            chunkSizeBytes: options.chunkSizeBytes,
-            contentType: options.contentType,
-            metadata: options.metadata,
-        }))
-            .on('error', function (err) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
+        return new Promise(function (resolve, reject) {
+            var uploadStream = _this.bucket.openUploadStream(options.filename, {
+                aliases: options.aliases,
+                chunkSizeBytes: options.chunkSizeBytes,
+                contentType: options.contentType,
+                metadata: options.metadata,
+            });
+            stream.pipe(uploadStream);
+            uploadStream.on('error', function (err) {
                 reject(err);
-                return [2 /*return*/];
             });
-        }); })
-            .on('finish', function (item) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                resolve(item);
-                return [2 /*return*/];
+            uploadStream.on('finish', function () {
+                resolve({
+                    _id: uploadStream.id,
+                    length: uploadStream.length,
+                    chunkSize: uploadStream.chunkSizeBytes,
+                    filename: options.filename,
+                    contentType: options.contentType,
+                    aliases: options.aliases,
+                    metadata: options.metadata,
+                    uploadDate: new Date()
+                });
             });
-        }); }); });
+        });
     };
     /**
      * Upload a file directly from a fs Path
@@ -236,10 +231,10 @@ var MongoGridFS = /** @class */ (function () {
      * @param {boolean} deleteFile
      * @return {Promise<IGridFSObject>}
      */
-    MongoGridFS.prototype.uploadFile = function (uploadFilePath, options, deleteFile) {
-        if (deleteFile === void 0) { deleteFile = true; }
-        return __awaiter(this, void 0, void 0, function () {
+    MongoGridFS.prototype.uploadFile = function (uploadFilePath_1, options_1) {
+        return __awaiter(this, arguments, void 0, function (uploadFilePath, options, deleteFile) {
             var tryDeleteFile;
+            if (deleteFile === void 0) { deleteFile = true; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -264,18 +259,27 @@ var MongoGridFS = /** @class */ (function () {
         });
     };
     /**
-     * Delete an File from the GridFS
+     * Delete a File from the GridFS
      * @param {string} id
      * @return {Promise<boolean>}
      */
     MongoGridFS.prototype.delete = function (id) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this.bucket.delete(new bson_1.ObjectId(id))
-                .then(function () { return resolve(true); })
-                .catch((function (err) {
-                reject(err);
-            }));
+        return __awaiter(this, void 0, void 0, function () {
+            var err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.bucket.delete(new bson_1.ObjectId(id))];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, true];
+                    case 2:
+                        err_1 = _a.sent();
+                        throw err_1;
+                    case 3: return [2 /*return*/];
+                }
+            });
         });
     };
     return MongoGridFS;
