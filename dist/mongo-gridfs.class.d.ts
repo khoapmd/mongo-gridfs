@@ -1,4 +1,4 @@
-import { ObjectId } from 'bson';
+import { ObjectId } from 'mongodb';
 import { Db, GridFSBucket, GridFSBucketReadStream } from 'mongodb';
 import { Stream } from 'stream';
 export interface IGridFSObject {

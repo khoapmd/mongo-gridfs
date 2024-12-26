@@ -1,4 +1,4 @@
-import {ObjectId} from 'bson';
+import {ObjectId} from 'mongodb';
 import * as fs from 'fs';
 import {Db, GridFSBucket, GridFSBucketReadStream} from 'mongodb';
 import osTmpdir = require('os-tmpdir');
@@ -110,7 +110,7 @@ export class MongoGridFS {
      * @return {Promise<IGridFSObject>}
      */
     public async findById(id: string): Promise<IGridFSObject> {
-        const result = await this.bucket.find({_id: new ObjectId(id)}).toArray();
+        const result = await this.bucket.find({ _id: new ObjectId(id) }).toArray();
         if (result.length === 0) {
             throw new Error('No Object found');
         }
