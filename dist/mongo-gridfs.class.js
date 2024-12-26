@@ -148,10 +148,16 @@ var MongoGridFS = /** @class */ (function () {
      */
     MongoGridFS.prototype.findById = function (id) {
         return __awaiter(this, void 0, void 0, function () {
+            var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.findOne({ _id: new bson_1.ObjectId(id) })];
-                    case 1: return [2 /*return*/, _a.sent()];
+                    case 0: return [4 /*yield*/, this.bucket.find({ _id: new bson_1.ObjectId(id) }).toArray()];
+                    case 1:
+                        result = _a.sent();
+                        if (result.length === 0) {
+                            throw new Error('No Object found');
+                        }
+                        return [2 /*return*/, result[0]];
                 }
             });
         });
@@ -166,7 +172,7 @@ var MongoGridFS = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.find(filter)];
+                    case 0: return [4 /*yield*/, this.bucket.find(filter).toArray()];
                     case 1:
                         result = _a.sent();
                         if (result.length === 0) {

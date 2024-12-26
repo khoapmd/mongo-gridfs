@@ -110,7 +110,11 @@ export class MongoGridFS {
      * @return {Promise<IGridFSObject>}
      */
     public async findById(id: string): Promise<IGridFSObject> {
-        return await this.findOne({_id: new ObjectId(id)});
+        const result = await this.bucket.find({_id: new ObjectId(id)}).toArray();
+        if (result.length === 0) {
+            throw new Error('No Object found');
+        }
+        return result[0];
     }
 
     /**
@@ -119,7 +123,7 @@ export class MongoGridFS {
      * @return {Promise<IGridFSObject>}
      */
     public async findOne(filter: any): Promise<IGridFSObject> {
-        const result = await this.find(filter);
+        const result = await this.bucket.find(filter).toArray();
         if (result.length === 0) {
             throw new Error('No Object found');
         }
