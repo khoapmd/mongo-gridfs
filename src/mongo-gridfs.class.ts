@@ -1,4 +1,4 @@
-import {ObjectId} from 'mongodb';
+import {ObjectId} from 'bson';
 import * as fs from 'fs';
 import {Db, GridFSBucket, GridFSBucketReadStream} from 'mongodb';
 import osTmpdir = require('os-tmpdir');

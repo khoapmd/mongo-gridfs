@@ -37,9 +37,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoGridFS = void 0;
-var mongodb_1 = require("mongodb");
+var bson_1 = require("bson");
 var fs = require("fs");
-var mongodb_2 = require("mongodb");
+var mongodb_1 = require("mongodb");
 var osTmpdir = require("os-tmpdir");
 var unique_filename_1 = require("unique-filename");
 var MongoGridFS = /** @class */ (function () {
@@ -55,7 +55,7 @@ var MongoGridFS = /** @class */ (function () {
     }
     Object.defineProperty(MongoGridFS.prototype, "bucket", {
         get: function () {
-            return new mongodb_2.GridFSBucket(this.connection, { bucketName: this.bucketName });
+            return new mongodb_1.GridFSBucket(this.connection, { bucketName: this.bucketName });
         },
         enumerable: false,
         configurable: true
@@ -151,7 +151,7 @@ var MongoGridFS = /** @class */ (function () {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.bucket.find({ _id: new mongodb_1.ObjectId(id) }).toArray()];
+                    case 0: return [4 /*yield*/, this.bucket.find({ _id: new bson_1.ObjectId(id) }).toArray()];
                     case 1:
                         result = _a.sent();
                         if (result.length === 0) {
@@ -276,7 +276,7 @@ var MongoGridFS = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.bucket.delete(new mongodb_1.ObjectId(id))];
+                        return [4 /*yield*/, this.bucket.delete(new bson_1.ObjectId(id))];
                     case 1:
                         _a.sent();
                         return [2 /*return*/, true];
