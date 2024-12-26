@@ -41,11 +41,11 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "bson": "^6.10.1",
     "es6-promise": "^4.2.8",
     "mongodb": "^6.12.0",
     "os-tmpdir": "^2.0.0",
-    "unique-filename": "^3.0.0",
-    "bson": "^5.5.1"
+    "unique-filename": "^3.0.0"
   },
   "scripts": {
     "build": "rimraf dist && tsc",
